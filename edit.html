@@ -237,6 +237,7 @@ input[type="checkbox"] {
 </body>
 
 <script>
+document.addEventListener("DOMContentLoaded", () => {
 
 const BASE_URL = "https://ludotheque-backend.onrender.com";
 
@@ -570,6 +571,13 @@ document.getElementById("btn-upload").onclick = async () => {
   const imageInput = document.getElementById("image");
   const imagesInput = document.getElementById("images");
 
+
+if (!imageInput || !imagesInput) {
+  console.error("Inputs image/images introuvables ❌");
+  return;
+}
+
+
   imageInput.value = uploadedPaths[0];              // principale
   imagesInput.value = uploadedPaths.join(",");     // galerie
 
@@ -593,6 +601,8 @@ status.innerHTML += `
 
 
 };
+
+});
 
 // ===================
 // DOWNLOAD
