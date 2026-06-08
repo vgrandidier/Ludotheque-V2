@@ -1,0 +1,291 @@
+        	body {
+            		font-family: Arial, sans-serif;
+            		margin: 0;
+            		padding: 0;
+            		background-color: #eff1ed;
+            		color: #333;
+        	}
+
+	        .container {
+            		max-width: 1200px;
+            		margin: 20px auto;
+	            	background: #eff1ed;
+            		padding: 20px;
+        	}
+
+        	.header {
+        		font-size: 3.5em;
+            		text-align: center;
+            		font-family: 'Dancing Script', cursive;
+            		color: black;
+            		padding: 10px;
+            		margin: 0;
+			width: 100%;
+        	}
+
+        	.game-list {
+            		display: grid;
+            		grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            		gap: 20px;
+        	}
+
+        	.game-card {
+            		background: white;
+            		border-radius: 10px;
+            		padding: 15px;
+            		box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+	            	transition: transform 0.3s;
+			font-family: Arial, sans-serif;
+        	}
+
+        	.game-card:hover {
+            		transform: scale(1.03);
+        	}
+
+        	.game-card img {
+            		max-width: 100%;
+            		height: auto;
+            		border-radius: 5px;
+	        }
+
+        	.game-card h3 {
+            		margin: 10px 0;
+            		font-size: 1.3em;
+            		color: #333;
+        	}
+
+        	.game-card a {
+            		display: inline-block;
+            		padding: 8px 15px;
+            		background-color: #333;
+            		color: white;
+            		text-decoration: none;
+            		border-radius: 5px;
+            		margin-top: 10px;
+	        }
+
+		.game-label {
+    	    		display: table;        /* Permet un ajustement automatique de la largeur */
+    	    		padding: 4px 8px;
+    	    		border-radius: 4px;
+    	    		font-size: 0.8em;
+    	    		font-weight: bold;
+    	    		margin: 10px 0;        /* Marge verticale */
+    	    		background-color: #4a90e2;
+    	    		color: white;
+    	    		text-align: left;
+    	    		width: auto;           /* Largeur automatique selon le contenu */
+		}
+
+		.game-type-label {
+    	    		display: inline-block;
+    	    		padding: 4px 8px;
+    	    		border-radius: 4px;
+    	    		font-size: 0.8em;
+    	    		font-weight: bold;
+    	    		text-align: center;
+    	    		float: right; /* Alignement à droite */
+    	    		margin-top: 10px; /* Ajustez selon votre mise en page */
+		}
+
+		.game-category-label {
+    	    		display: inline-block;
+    	    		padding: 4px 8px;
+    	    		border-radius: 4px;
+    	    		font-size: 0.8em;
+    	    		font-weight: bold;
+    	    		text-align: center;
+    	    		float: left; /* Alignement à droite */
+    	    		margin-top: 10px; /* Ajustez selon votre mise en page */
+		}
+
+		/* Couleur pour "Enfants" */
+		.game-label.child, .game-type-label.child {
+    	    		background-color: #a7c957; 
+    	    		color: #ffffff;
+    	    		margin-right: 10px;
+                    text-transform: uppercase;
+                    font-size: 0.7em;
+		}
+
+		/* Couleur pour "Favori" */
+		.game-label.favorite, .game-type-label.favorite, .game-category-label.favorite {
+    	    		background-color: #fb8500;
+    	    		color: #ffffff;
+    	    		margin-right: 10px;
+		}
+
+		/* Couleur pour "Dans ma ludothèque" */
+		.game-label.buy, .game-type-label.buy, .game-category-label.buy {
+    	    		background-color: #be95c4; /*#219ebc;*/
+    	    		color: #ffffff;
+    	    		margin-right: 10px;
+		}
+
+		/* Couleur pour "Découverte" */
+		.game-label.discover, .game-type-label.discover, .game-category-label.discover {
+    	    		background-color: #8ecae6;
+    	    		color: #ffffff;
+    	    		margin-right: 10px;
+		}
+
+		/* Couleur pour "Classique" */
+		.game-label.classic, .game-type-label.classic, .game-category-label.classic {
+    	    		background-color: #2492a3;
+    	    		color: #ffffff;
+    	    		margin-right: 10px;
+		}
+
+                .game-category-label.spiel {
+     	    		background-color: #ffffff;
+    	    		color: #009fe3;
+                        border: solid 1px #009fe3;
+    	    		margin-right: 10px;                       
+                }
+
+                .game-category-label.cannes {
+     	    		background-color: #ffffff;
+    	    		color: #ba9e48;
+                        border: solid 1px #ba9e48;
+    	    		margin-right: 10px;                       
+                }
+
+
+		/* Couleur pour "Extension" */
+		.game-label.extension, game-type-label.extension {
+    	    		background-color: #333333;
+    	    		color: #ffffff;
+    	    		margin-right: 10px;
+		}
+
+		/* Couleur pour "Style de jeu" */
+		.game-label.style, 
+		.game-type-label.affrontement, 
+                .game-type-label.ambiance,
+                .game-type-label.bluff,
+		.game-type-label.cartes, 
+		.game-type-label.conquete, 	
+		.game-type-label.cooperatif, 	
+		.game-type-label.construction, 
+		.game-type-label.course, 	
+                .game-type-label.deck-building,
+                .game-type-label.escape-game,
+		.game-type-label.exploration, 	
+		.game-type-label.imagination, 
+                .game-type-label.jeu-a-cocher,
+		.game-type-label.jeu-de-des, 
+		.game-type-label.reflexion, 
+		.game-type-label.strategie, 
+		.game-type-label.tuiles, 
+                .game-type-label.default
+		{
+    	    		background-color: #dad7cd;
+    	    		color: #344e41;
+    	    		margin-right: 10px;
+                    text-transform: uppercase;
+                    font-size: 0.7em;
+		}
+
+                .game-type-label.competitif,
+                .game-type-label.deuxjoueurs
+                {
+                        background-color: #c2e5ce;
+                        color: #336043;
+                        margin-right: 10px;
+                }
+
+                .game-type-label.artisanat
+                {
+                        background-color: #fef1e9;
+                        color: #f4772b;
+                        margin-right: 10px;
+                }
+
+                .game-type-label.extension
+		{
+    	    		background-color: #e63946;
+    	    		color: #ffffff;
+    	    		margin-right: 10px;
+		}
+
+		.filters {
+                        margin: 20px 0;
+                        text-align: center;
+                        font-family: 'Roboto', sans-serif;
+                        display: flex; /* Par défaut, affiche en ligne (pour ordinateur) */
+                        flex-wrap: wrap; /* Permet le retour à la ligne si nécessaire */
+                        justify-content: center; /* Centre les éléments */
+                        align-items: center; /* Centre verticalement */
+                        gap: 10px; /* Espacement entre les éléments */
+		}
+
+		.filters label {
+    			margin: 0; /* 10px; */
+    			color: #555;
+    			font-weight: 500;
+		}
+
+		.filters select {
+    			margin: 0; /* 10px; */
+    			padding: 10px 30px 10px 15px; /* Padding à droite plus grand */
+    			border: 1px solid #ccc;
+    			border-radius: 4px;
+    			background-color: white;
+    			font-size: 16px;
+    			box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    			transition: all 0.3s ease;
+    			min-width: 200px;
+    			appearance: none; /* Garde l'apparence par défaut du navigateur */
+    			text-indent: 0.01px; /* Astuce pour Chrome */
+    			text-overflow: '';
+		}
+
+		.filters select:focus {
+    			outline: none;
+    			border-color: #6200ee;
+    			box-shadow: 0 0 0 2px rgba(98, 0, 238, 0.2);
+		}
+
+		.filters select option {
+    			padding: 10px;
+    			background-color: white;
+    			color: #333;
+		}
+
+		.sticky-header {
+    			position: sticky;
+    			top: 0;
+    			background-color: #eff1ed; /* Même couleur que ton fond */
+    			padding: 5px 0;
+    			z-index: 100;
+    			width: 100%; /* Pour s'assurer que la div prend toute la largeur */
+		}
+
+                
+                .game-details {
+                        display: flex;
+                        gap: 0%;
+                        margin: 0;
+                        justify-content: center;
+                        flex-wrap: wrap;
+                }
+
+                .detail, .detail-no-border {
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        text-align: center;
+                        padding-right: 8px;
+                        padding-left: 8px;
+                        width: 18%;
+                        font-size: 14px;
+                }
+                .detail {
+                        border-right: solid 1px #669bbc;
+                }
+
+                .detail i.material-icons, .detail-no-border i.material-icons {
+                        font-size: 24px; /* Taille plus grande */
+                        color: #669bbc;  /* Couleur primaire Material */
+                        margin-bottom: 5px;
+                }

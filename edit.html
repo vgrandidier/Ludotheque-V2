@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+<title>Admin Ludothèque</title>
+
+<style>
+body {
+  font-family: 'Roboto', Arial, sans-serif;
+  max-width: 900px;
+  margin: auto;
+  background: #f5f5f5;
+  padding: 20px;
+}
+
+/* Sections */
+h3 {
+  margin-top: 30px;
+  margin-bottom: 10px;
+  padding-bottom: 5px;
+  border-bottom: 2px solid #eee;
+  color: #333;
+}
+
+/* Inputs */
+input, textarea, select {
+  width: 100%;
+  margin-bottom: 12px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: 0.2s;
+}
+
+input:focus, textarea:focus, select:focus {
+  border-color: #6200ee;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(98,0,238,0.1);
+}
+
+/* Buttons */
+button {
+  background: #6200ee;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #4b00c2;
+}
+
+button[style*="secondary"],
+button.secondary {
+  background: #eee;
+  color: #333;
+}
+
+/* Preview */
+.preview {
+  border:1px solid #ddd;
+  padding:15px;
+  margin-top:20px;
+  border-radius: 10px;
+  background: #fff;
+}
+
+/* ===== PRICES ===== */
+
+.price-item {
+  border: 1px solid #e0e0e0;
+  padding: 15px;
+  margin-bottom: 15px;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+/* BEST PRICE */
+.price-item.best {
+  border-color: #2ecc71;
+  background: #f0fff4;
+}
+
+.price-item.best::before {
+  content: "⭐ Meilleur prix";
+  display: block;
+  font-size: 12px;
+  color: #2ecc71;
+  margin-bottom: 8px;
+}
+
+/* Ligne inputs vendeur/prix */
+.price-row {
+  display: flex;
+  gap: 10px;
+}
+
+.price-row input {
+  flex: 1;
+}
+
+/* Checkbox + bouton */
+.price-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+}
+
+label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+input[type="checkbox"] {
+  width: auto;
+  margin: 0;
+}
+
+.checkbox-group {
+  display: flex;
+  flex-direction: column;
+  margin-top: 10px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>Gestion des jeux</h1>
+
+<select id="selector">
+  <option value="">-- Nouveau jeu --</option>
+</select>
+
+<button id="delete">Supprimer</button>
+
+<hr>
+
+<form id="form">
+
+<h3>Infos</h3>
+<input id="idInput" placeholder="ID">
+<input id="title" placeholder="Titre">
+<textarea id="description" placeholder="Description"></textarea>
+
+<h3>Images du jeu (boîte + plateau)</h3>
+
+<input type="file" id="upload-images" multiple accept="image/*">
+<button type="button" id="btn-upload">Uploader les images</button>
+
+<div id="status" style="margin-top:10px; font-weight:bold;"></div>
+
+<h3>Vidéo YouTube</h3>
+<input id="youtube" placeholder="https://www.youtube.com/embed/xxxxx">
+
+<h3>Détails</h3>
+<input id="age" placeholder="Age">
+<input id="players" placeholder="Joueurs">
+<input id="duration" placeholder="Durée">
+
+<!-- ✅ TYPES MULTI SELECT -->
+<h3>Types</h3>
+<select id="types" multiple size="10">
+<option value="affrontement">Affrontement</option>
+<option value="ambiance">Ambiance</option>
+<option value="bluff">Bluff</option>
+<option value="cartes">Cartes</option>
+<option value="conquete">Conquête</option>
+<option value="cooperatif">Coopératif</option>
+<option value="construction">Construction</option>
+<option value="course">Course</option>
+<option value="deck-building">Deck Building</option>
+<option value="child">Enfants</option>
+<option value="escape-game">Escape Game</option>
+<option value="exploration">Exploration</option>
+<option value="extension">Extension</option>
+<option value="imagination">Imagination</option>
+<option value="jeu-a-cocher">Jeu à cocher</option>
+<option value="jeu-de-des">Jeu de dés</option>
+<option value="reflexion">Réflexion</option>
+<option value="strategie">Stratégie</option>
+<option value="tactique">Tactique</option>
+<option value="tuiles">Tuiles</option>
+</select>
+
+<h3>Labels</h3>
+<div class="checkbox-group">
+  <label><input type="checkbox" id="favorite"> Coup de coeur</label>
+  <label><input type="checkbox" id="discover"> Wishlist</label>
+  <label><input type="checkbox" id="buy"> Ludothèque</label>
+</div>
+
+<h3>Récompenses</h3>
+<div class="checkbox-group">
+  <label><input type="checkbox" id="spiel"> Spiel</label>
+  <label><input type="checkbox" id="cannes"> Cannes</label>
+</div>
+
+<h3>Récompenses détaillées</h3>
+<input id="rewards" placeholder="Spiel des Jahres, As d'Or">
+
+
+<!-- ✅ PRIX DYNAMIQUES -->
+<h3>Prix minimum (affiché)</h3>
+<input id="price" placeholder="Ex: 29.99">
+
+<h3>Prix</h3>
+
+<div id="prices-container"></div>
+<button type="button" id="add-price">+ Ajouter un prix</button>
+
+<h3>Détails du jeu</h3>
+<textarea id="rules" placeholder="Règles"></textarea>
+<textarea id="material" placeholder="Matériel"></textarea>
+<textarea id="victory" placeholder="Victoire"></textarea>
+
+<br>
+
+<button type="submit">Enregistrer</button>
+
+</form>
+
+</body>
+
+<script>
+
+let games = [];
+let currentId = null;
+
+const imagesInput = document.getElementById("images");
+const imageInput = document.getElementById("image")
+
+// ===================
+// LOAD
+// ===================
+
+fetch('http://localhost:3000/games')
+.then(r => r.json())
+.then(data => {
+  games = data;
+  renderSelect();
+});
+
+function renderSelect() {
+  selector.innerHTML = `<option value="">-- Nouveau jeu --</option>`;
+  games.forEach(g => {
+    const o = document.createElement('option');
+    o.value = g.id;
+    o.textContent = g.title;
+    selector.appendChild(o);
+  });
+}
+
+// =====================================
+// CONVERSION YOUTUBE TO EMBEDDED FORMAT
+// =====================================
+function normalizeYoutube(url) {
+  if (!url) return "";
+
+  if (url.includes("watch?v=")) {
+    const id = url.split("watch?v=")[1];
+    return "https://www.youtube.com/embed/" + id;
+  }
+
+  return url;
+}
+
+// ===================
+// TYPES SELECT LOAD
+// ===================
+
+function selectTypes(list) {
+  Array.from(types.options).forEach(opt => {
+    opt.selected = list.includes(opt.value);
+  });
+}
+
+// ===================
+// PRICES UI
+// ===================
+
+function addPrice(price = {}) {
+  const div = document.createElement('div');
+  div.className = "price-item" + (price.best ? " best" : "");
+
+  div.innerHTML = `
+    <div class="price-row">
+      <input placeholder="Vendeur" value="${price.vendor || ''}">
+      <input placeholder="Prix" value="${price.price || ''}">
+    </div>
+
+    <input placeholder="URL" value="${price.url || ''}">
+
+    <select>
+      <option value="default" ${price.type==="default"?"selected":""}>Default</option>
+      <option value="boutique" ${price.type==="boutique"?"selected":""}>Boutique</option>
+    </select>
+
+    <div class="price-footer">
+      <label>
+        <input type="checkbox" ${price.best ? "checked" : ""}>
+        Meilleur prix
+      </label>
+      <button type="button" class="secondary">Supprimer</button>
+    </div>
+  `;
+
+  // ✅ suppression
+  div.querySelector("button").onclick = () => div.remove();
+
+  // ✅ mise à jour visuelle du best
+  const checkbox = div.querySelector('input[type="checkbox"]');
+  checkbox.onchange = () => {
+    div.classList.toggle("best", checkbox.checked);
+  };
+
+  document.getElementById('prices-container').appendChild(div);
+}
+
+
+document.getElementById('add-price').onclick = () => addPrice();
+
+// ===================
+// SELECT GAME
+// ===================
+
+selector.onchange = e => {
+
+  const id = e.target.value;
+
+  if (!id) {
+    form.reset();
+    document.getElementById('prices-container').innerHTML="";
+    currentId = null;
+    return;
+  }
+
+  const g = games.find(x => x.id === id);
+  currentId = id;
+
+  idInput.value = g.id;
+  title.value = g.title;
+  description.value = g.description;
+  image.value = g.image;
+  images.value = (g.images || []).join(",");
+  youtube.value = g.youtube || "";
+
+  age.value = g.age;
+  players.value = g.players;
+  duration.value = g.duration;
+
+  selectTypes(g.types || []);
+
+  favorite.checked = (g.favorite||[]).length>0;
+  discover.checked = (g.discovery||[]).length>0;
+  buy.checked = (g.buy||[]).length>0;
+
+  spiel.checked = (g.spiel||[]).length>0;
+  cannes.checked = (g.cannes||[]).length>0;
+  rewards.value = (g.details?.rewards || []).join(",");
+  
+  price.value = g.price || "";
+
+  document.getElementById('prices-container').innerHTML="";
+  (g.prices || []).forEach(p => addPrice(p));
+
+  rules.value = g.details?.rules || "";
+  material.value = g.details?.material || "";
+  victory.value = g.details?.victory || "";
+
+  updatePreview();
+};
+
+// ===================
+// AUTO ID
+// ===================
+
+title.addEventListener('input', () => {
+  if (!currentId) {
+    idInput.value = title.value
+      .toLowerCase()
+      .replace(/\s+/g, '-');
+  }
+});
+
+// ===================
+// SAVE
+// ===================
+
+form.onsubmit = e => {
+  e.preventDefault();
+
+  const newGame = {
+    id: idInput.value,
+    title: title.value,
+    description: description.value,
+    pricesdate: new Date().toISOString().split('T')[0],
+
+    image: image.value,
+    images: images.value.split(',').map(x=>x.trim()),
+
+    youtube: normalizeYoutube(youtube.value),
+
+    age: Number(age.value),
+    players: players.value,
+    duration: Number(duration.value),
+
+    types: Array.from(types.selectedOptions).map(o=>o.value),
+
+    child: Array.from(types.selectedOptions)
+      .map(o => o.value)
+      .includes("child") ? ["Enfants"] : [],
+
+    favorite: favorite.checked ? ["Coup de coeur"] : [],
+    discovery: discover.checked ? ["Wishlist"] : [],
+    buy: buy.checked ? ["Ludothèque"] : [],
+
+    spiel: spiel.checked ? ["Spiel"] : [],
+    cannes: cannes.checked ? ["Cannes"] : [],
+
+    rewards: rewards.value.split(',').map(x => x.trim()),
+
+    prices: Array.from(document.querySelectorAll('.price-item')).map(div=>{
+      const i = div.querySelectorAll("input, select");
+      return {
+        vendor: i[0].value,
+        price: i[1].value,
+        url: i[2].value,
+        type: i[3].value,
+        best: i[4]?.checked || false
+      };
+    }),
+
+    price: price.value,
+
+    details: {
+      rules: rules.value,
+      material: material.value,
+      victory: victory.value,
+      rewards: []
+    }
+
+  };
+
+  // ✅ 1. Mise à jour locale
+  const index = games.findIndex(g => g.id === newGame.id);
+
+  if (index >= 0) games[index] = newGame;
+  else games.push(newGame);
+
+  // ✅ 2. Sauvegarde serveur
+  fetch('http://localhost:3000/games', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(games)
+  })
+  .then(res => {
+    if (!res.ok) throw new Error("Erreur serveur");
+    
+    // ✅ 3. Mise à jour UI seulement après succès
+    renderSelect();
+
+    alert("✅ Sauvegardé !");
+  })
+  .catch(err => {
+    console.error(err);
+    alert("❌ Erreur lors de la sauvegarde !");
+  });
+};
+
+// ===================
+// DELETE
+// ===================
+
+document.getElementById('delete').onclick = () => {
+
+  if (!currentId) return;
+  if (!confirm("Supprimer ?")) return;
+
+  fetch(`http://localhost:3000/games/${currentId}`, {
+    method: 'DELETE'
+  })
+  .then(() => {
+    games = games.filter(g => g.id !== currentId);
+    form.reset();
+    currentId = null;
+    renderSelect();
+    alert("✅ Supprimé");
+  });
+
+};
+
+// =================
+// UPLOAD DES IMAGES
+// =================
+function showStatus(message, isError = false) {
+
+  status.innerText = message;
+  status.style.color = isError ? "red" : "green";
+
+  setTimeout(() => {
+    status.innerText = "";
+  }, 4000);
+}
+
+document.getElementById("btn-upload").onclick = async () => {
+
+  const input = document.getElementById("upload-images");
+  const files = input.files;
+
+  const status = document.getElementById("status");
+
+  if (!files || files.length === 0) {
+    showStatus("❌  Aucune image sélectionnée", true);
+    return;
+  }
+
+  if (files.length > 2) {
+    showStatus("❌ Maximum 2 images (boîte + plateau)", true);
+    return;
+  }
+
+  let uploadedPaths = [];
+
+  for (let file of files) {
+
+    const formData = new FormData();
+    formData.append("image", file);
+
+    try {
+      const res = await fetch("http://localhost:3000/upload", {
+        method: "POST",
+        body: formData
+      });
+
+      const data = await res.json();
+
+      if (!data.filename) throw new Error("Erreur serveur");
+
+      uploadedPaths.push("images/" + data.filename);
+
+    } catch (err) {
+      console.error(err);
+      showStatus("❌ Erreur upload image", true);
+      return;
+    }
+  }
+
+  // ✅ Affectation propre
+  const imageInput = document.getElementById("image");
+  const imagesInput = document.getElementById("images");
+
+  imageInput.value = uploadedPaths[0];              // principale
+  imagesInput.value = uploadedPaths.join(",");     // galerie
+
+    // ✅ reset input (optionnel)
+  //input.value = "";
+
+
+// ✅ afficher les noms des fichiers
+const fileNames = Array.from(files).map(f => f.name);
+
+status.innerHTML = `
+  ✅ Images uploadées :<br>
+  ${fileNames.map(name => `- ${name}`).join("<br>")}
+`;
+
+
+status.innerHTML += `
+  <br><br>
+  ${uploadedPaths.map(p => `<img src="${p}" width="100">`).join("")}
+`;
+
+
+};
+
+// ===================
+// DOWNLOAD
+// ===================
+
+/*download.onclick = () => {
+  const blob = new Blob([JSON.stringify(games,null,2)], {type:"application/json"});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = "games.json";
+  a.click();
+};*/
+
+</script>
+</html>

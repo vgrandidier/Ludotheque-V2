@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Ma Ludothèque Idéale</title>
+	<link rel="icon" type="image/png" href="images/favicon.png">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Caveat&family=Dancing+Script&family=Pacifico&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/index.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap');
+    /* Pour mobile */
+    @media (max-width: 768px) {
+      .filters {
+        flex-direction: column; /* Affiche les éléments en colonne */
+        align-items: stretch; /* Étire les éléments pour qu'ils prennent toute la largeur */
+      }
+
+      .filters label,
+      .filters select {
+        width: 100%; /* Prend toute la largeur disponible */
+        margin-bottom: 10px; /* Espacement entre les éléments */
+      }
+
+      .header {
+        font-size: 2em;
+      }
+    }  
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+  <div class="header">Ma Ludothèque Idéale</div>
+  <div class="sticky-header">
+    <div class="filters">
+      <label for="main-label-filter">Filtrer par <b>Type</b> :</label>
+      <select id="main-label-filter">
+        <option value="">Tous</option>
+        <option value="favorite">Coup de Coeur</option>
+        <option value="discover">Wishlist</option>
+        <option value="buy">Ludothèque</option>
+      </select>
+
+      <label for="type-label-filter">Filtrer par <b>Catégorie</b> :</label>
+      <select id="type-label-filter">
+        <option value="">Tous</option>
+        <option value="affrontement">Affrontement</option>
+        <option value="ambiance">Ambiance</option>
+        <option value="bluff">Bluff</option>
+        <option value="cartes">Cartes</option>
+        <option value="conquete">Conquête</option>
+        <option value="cooperatif">Coopératif</option>
+        <option value="construction">Construction</option>
+        <option value="course">Course</option>
+        <option value="deck-building">Deck Building</option>
+        <option value="child">Enfants</option>
+        <option value="escape-game">Escape Game</option>
+        <option value="exploration">Exploration</option>
+        <option value="extension">Extension</option>
+        <option value="imagination">Imagination</option>
+        <option value="jeu-a-cocher">Jeu à cocher</option>
+        <option value="jeu-de-des">Jeu de dés</option>
+        <option value="reflexion">Réflexion</option>
+        <option value="strategie">Stratégie</option>
+        <option value="tactique">Tactique</option>
+        <option value="tuiles">Tuiles</option>
+      </select>
+
+      <label for="award-label-filter">Filtrer par <b>Récompense</b> :</label>
+      <select id="award-label-filter">
+        <option value="">Tous</option>
+        <option value="spiel">Spiel des Jahres</option>
+        <option value="cannes">As d'Or</option>
+      </select>
+
+    </div>
+  </div>
+
+  <div class="game-list" id="game-list"></div>
+</div>
+
+<script>
+
+// ===========================
+// 1. CHARGEMENT DES JEUX
+// ===========================
+
+fetch('games.json')
+  .then(res => res.json())
+  .then(games => {
+
+    const container = document.getElementById('game-list');
+
+    games.forEach(game => {
+
+      const card = document.createElement('div');
+      card.className = 'game-card';
+
+      card.id = "game-" + game.id;
+
+      // discovery
+      let discoveryHTML = '';
+      game.discovery.forEach(discovery => {
+        discoveryHTML += `<span class="game-category-label discover">${discovery}</span>`;
+      });
+
+      // favorite
+      let favoriteHTML = '';
+      game.favorite.forEach(favorite => {
+        favoriteHTML += `<span class="game-category-label favorite">${favorite}</span>`;
+      });
+
+      // buy
+      let buyHTML = '';
+      game.buy.forEach(buy => {
+        buyHTML += `<span class="game-category-label buy">${buy}</span>`;
+      });
+
+      // spiel
+      let spielHTML = '';
+      game.spiel.forEach(spiel => {
+        spielHTML += `<span class="game-category-label spiel">${spiel}</span>`;
+      });
+
+      // cannes
+      let cannesHTML = '';
+      game.cannes.forEach(cannes => {
+        cannesHTML += `<span class="game-category-label cannes">${cannes}</span>`;
+      });
+
+      // types
+      let typesHTML = '';
+      game.types.forEach(types => {
+        typesHTML += `<span class="game-type-label ${types}">${types}</span>`;
+      });    
+
+      // child
+      let childHTML = '';
+      game.child.forEach(child => {
+        childHTML += `<span class="game-type-label child">${child}</span>`;
+      });
+
+      card.dataset.main = [
+        ...((game.discovery || []).length ? ["discover"] : []),
+        ...((game.favorite || []).length ? ["favorite"] : []),
+        ...((game.buy || []).length ? ["buy"] : [])
+      ].join(" ");
+
+      card.dataset.type = (game.types || []).join(" ");
+      card.dataset.child = (game.child || []).join(" ");
+
+      card.dataset.award = [
+        ...((game.spiel || []).length ? ["spiel"] : []),
+        ...((game.cannes || []).length ? ["cannes"] : [])
+      ].join(" ");
+
+      
+
+      card.innerHTML = `
+        ${discoveryHTML}
+        ${favoriteHTML}
+        ${buyHTML}
+        ${spielHTML}
+        ${cannesHTML}
+
+        <img src="${game.image}" alt="Boïte du jeu">
+        <div class="game-details">
+          <div class="detail">
+            <i class="material-icons">face</i>
+            <span><b>${game.age}</b> ans</span>
+          </div>
+          <div class="detail">
+            <i class="material-icons">people</i>
+            <span><b>${game.players}</b></span>
+          </div>
+          <div class="detail">
+            <i class="material-icons">timer</i>
+            <span><b>${game.duration}</b> mn</span>
+          </div>
+          <div class="detail-no-border">
+            <i class="material-icons">sell</i>
+            <span><b>${game.price}</b> €</span>
+          </div>
+        </div>
+
+        <p>${game.description}</p>
+
+
+        <a href="${buildGameUrl(game.id)}">
+          Voir la fiche
+        </a>
+
+        ${typesHTML} 
+        ${childHTML}
+      `;
+
+      container.appendChild(card);
+    });
+
+    
+    // ✅ IMPORTANT : activer filtres après génération
+    initFilters();
+
+    // ===========================
+    // ✅ SCROLL VERS LE JEU
+    // ===========================
+
+    const params = new URLSearchParams(window.location.search);
+    const focusId = params.get('focus');
+
+    if (focusId) {
+      setTimeout(() => {
+        const target = document.getElementById("game-" + focusId);
+
+        if (target) {
+          target.scrollIntoView({
+            behavior: "smooth",
+            block: "center"
+          });
+
+          // ✅ bonus : surlignage temporaire
+          target.style.boxShadow = "0 0 15px 5px gold";
+
+          setTimeout(() => {
+            target.style.boxShadow = "";
+          }, 2000);
+        }
+      }, 300); // petit délai pour être sûr que le DOM est prêt
+    }    
+  });
+
+
+function buildGameUrl(gameId) {
+  const mainValue = document.getElementById('main-label-filter')?.value;
+  const typeValue = document.getElementById('type-label-filter')?.value;
+  const awardValue = document.getElementById('award-label-filter')?.value;
+
+  const params = new URLSearchParams();
+
+  if (mainValue) params.set("main", mainValue);
+  if (typeValue) params.set("type", typeValue);
+  if (awardValue) params.set("award", awardValue);
+
+  return params.toString()
+    ? `game.html?id=${gameId}&${params.toString()}`
+    : `game.html?id=${gameId}`;
+}
+
+
+// ===========================
+// 2. FILTRES
+// ===========================
+
+function initFilters() {
+  
+  const mainFilter = document.getElementById('main-label-filter');
+  const typeFilter = document.getElementById('type-label-filter');
+  const awardFilter = document.getElementById('award-label-filter');
+
+  const params = new URLSearchParams(window.location.search);
+
+  if (params.get("main")) {
+    mainFilter.value = params.get("main");
+  }
+
+  if (params.get("type")) {
+    typeFilter.value = params.get("type");
+  }
+
+  if (params.get("award")) {
+    awardFilter.value = params.get("award");
+  }
+
+  function applyFilters() {
+
+    const mainValue = mainFilter.value;
+    const typeValue = typeFilter.value;
+    const awardValue = awardFilter.value;
+
+    // ✅ IMPORTANT : récupérer les cartes à chaque fois
+    const cards = document.querySelectorAll('.game-card');
+
+    cards.forEach(card => {
+
+      const main = card.dataset.main || "";
+      const type = card.dataset.type || "";
+      const award = card.dataset.award || "";
+
+      let show = true;
+
+      if (mainValue && !main.includes(mainValue)) {
+        show = false;
+      }
+
+      if (typeValue && !type.includes(typeValue)) {
+        show = false;
+      }
+
+      if (awardValue && !award.includes(awardValue)) {
+        show = false;
+      }
+
+      card.style.display = show ? "block" : "none";
+    });
+
+    // ✅ Sauvegarde des filtres dans l'URL
+    const params = new URLSearchParams();
+
+    if (mainValue) params.set("main", mainValue);
+    if (typeValue) params.set("type", typeValue);
+    if (awardValue) params.set("award", awardValue);
+
+    // garde aussi le focus s’il existe
+    const currentParams = new URLSearchParams(window.location.search);
+    if (currentParams.get("focus")) {
+      params.set("focus", currentParams.get("focus"));
+    }
+
+    history.replaceState(null, "", "?" + params.toString());
+
+  }
+
+  // Events
+  mainFilter.addEventListener('change', applyFilters);
+  typeFilter.addEventListener('change', applyFilters);
+  awardFilter.addEventListener('change', applyFilters);
+
+  // ✅ Lance les filtres au chargement
+  applyFilters();
+}
+
+
+</script>
+
+</body>
+</html>
