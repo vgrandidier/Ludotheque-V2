@@ -234,6 +234,8 @@ input[type="checkbox"] {
 
 <script>
 
+const BASE_URL = "https://ludotheque-backend.onrender.com";
+
 let games = [];
 let currentId = null;
 
@@ -244,7 +246,7 @@ const imageInput = document.getElementById("image")
 // LOAD
 // ===================
 
-fetch('http://localhost:3000/games')
+fetch(`${BASE_URL}/games`)
 .then(r => r.json())
 .then(data => {
   games = data;
@@ -459,7 +461,7 @@ form.onsubmit = e => {
   else games.push(newGame);
 
   // ✅ 2. Sauvegarde serveur
-  fetch('http://localhost:3000/games', {
+  fetch(`${BASE_URL}/games`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -489,7 +491,7 @@ document.getElementById('delete').onclick = () => {
   if (!currentId) return;
   if (!confirm("Supprimer ?")) return;
 
-  fetch(`http://localhost:3000/games/${currentId}`, {
+  fetch(`${BASE_URL}/games/${currentId}`, {
     method: 'DELETE'
   })
   .then(() => {
@@ -540,7 +542,7 @@ document.getElementById("btn-upload").onclick = async () => {
     formData.append("image", file);
 
     try {
-      const res = await fetch("http://localhost:3000/upload", {
+      const res = await fetch(`${BASE_URL}/upload`, {
         method: "POST",
         body: formData
       });
@@ -580,7 +582,7 @@ status.innerHTML = `
 
 status.innerHTML += `
   <br><br>
-  ${uploadedPaths.map(p => `<img src="${p}" width="100">`).join("")}
+  ${uploadedPaths.map(p => `<img src="${BASE_URL}/${p}" width="100">`).join("")}
 `;
 
 

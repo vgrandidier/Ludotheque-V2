@@ -85,11 +85,13 @@
 
 <script>
 
+const BASE_URL = "https://ludotheque-backend.onrender.com";
+
 // ===========================
 // 1. CHARGEMENT DES JEUX
 // ===========================
+fetch(`${BASE_URL}/games`)
 
-fetch('games.json')
   .then(res => res.json())
   .then(games => {
 
@@ -167,7 +169,7 @@ fetch('games.json')
         ${spielHTML}
         ${cannesHTML}
 
-        <img src="${game.image}" alt="Boïte du jeu">
+        <img src="${BASE_URL}/${game.image}" alt="Boïte du jeu">
         <div class="game-details">
           <div class="detail">
             <i class="material-icons">face</i>

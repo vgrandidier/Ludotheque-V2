@@ -144,6 +144,8 @@
 
 <script>
 
+const BASE_URL = "https://ludotheque-backend.onrender.com";
+
 // ==========================
 // 1. RECUP ID URL
 // ==========================
@@ -168,7 +170,7 @@ backLink.href = "index.html" + (
 // 2. CHARGER JSON
 // ==========================
 
-fetch('games.json')
+fetch(`${BASE_URL}/games`)
   .then(res => res.json())
   .then(games => {
 
@@ -192,7 +194,7 @@ fetch('games.json')
 
     images.forEach((src, index) => {
       const img = document.createElement('img');
-      img.src = src;
+      img.src = `${BASE_URL}/${src}`;
 
       img.addEventListener('click', () => openModal(index));
 
@@ -292,7 +294,7 @@ fetch('games.json')
   function openModal(index) {
     currentImageIndex = index;
     modal.style.display = "block";
-    modalImg.src = images[index];
+    modalImg.src = `${BASE_URL}/${images[index]}`;
   }
 
   function closeModal() {
@@ -304,12 +306,12 @@ fetch('games.json')
 
   document.querySelector('.prev').onclick = () => {
     currentImageIndex = (currentImageIndex - 1 + images.length) % images.length;
-    modalImg.src = images[currentImageIndex];
+    modalImg.src = `${BASE_URL}/${images[currentImageIndex]}`;
   };
 
   document.querySelector('.next').onclick = () => {
     currentImageIndex = (currentImageIndex + 1) % images.length;
-    modalImg.src = images[currentImageIndex];
+    modalImg.src = `${BASE_URL}/${images[currentImageIndex]}`;
   };
 
   // clic extérieur
