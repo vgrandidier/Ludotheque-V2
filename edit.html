@@ -524,6 +524,8 @@ document.getElementById("btn-upload").onclick = async () => {
 
   const status = document.getElementById("status");
 
+  console.log("CLICK upload");
+
   if (!files || files.length === 0) {
     showStatus("❌  Aucune image sélectionnée", true);
     return;
