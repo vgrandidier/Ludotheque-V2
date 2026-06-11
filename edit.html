@@ -514,6 +514,10 @@ document.getElementById('delete').onclick = () => {
 // =================
 function showStatus(message, isError = false) {
 
+  const status = document.getElementById("status"); // ✅ AJOUT
+
+  if (!status) return;
+
   status.innerText = message;
   status.style.color = isError ? "red" : "green";
 
