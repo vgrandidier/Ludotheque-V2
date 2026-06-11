@@ -558,7 +558,8 @@ document.getElementById("btn-upload").onclick = async () => {
 
       if (!data.filename) throw new Error("Erreur serveur");
 
-      uploadedPaths.push("images/" + data.filename);
+      //uploadedPaths.push("images/" + data.filename);
+      uploadedPaths.push(data.url);
 
     } catch (err) {
       console.error(err);
