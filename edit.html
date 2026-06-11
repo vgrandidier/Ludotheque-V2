@@ -252,11 +252,18 @@ const imageInput = document.getElementById("image")
 // ===================
 
 fetch(`${BASE_URL}/games`)
-.then(r => r.json())
-.then(data => {
-  games = data;
-  renderSelect();
-});
+  .then(r => r.json())
+  .then(data => {
+
+    if (!Array.isArray(data)) {
+      console.error("Données invalides ❌", data);
+      games = [];
+      return;
+    }
+
+    games = data;
+    renderSelect();
+  });
 
 function renderSelect() {
   selector.innerHTML = `<option value="">-- Nouveau jeu --</option>`;
@@ -466,26 +473,30 @@ form.onsubmit = e => {
   else games.push(newGame);
 
   // ✅ 2. Sauvegarde serveur
-  fetch(`${BASE_URL}/games`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(games)
-  })
-  .then(res => {
-    if (!res.ok) throw new Error("Erreur serveur");
-    
-    // ✅ 3. Mise à jour UI seulement après succès
-    renderSelect();
 
-    alert("✅ Sauvegardé !");
-  })
-  .catch(err => {
-    console.error(err);
-    alert("❌ Erreur lors de la sauvegarde !");
-  });
-};
+fetch(`${BASE_URL}/games`, {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify(games)
+})
+.then(async res => {
+  if (!res.ok) throw new Error("Erreur serveur");
+
+  // ✅ RECHARGER LES DONNÉES
+  const newData = await fetch(`${BASE_URL}/games`);
+  games = await newData.json();
+
+  renderSelect();
+
+  alert("✅ Sauvegardé !");
+})
+.catch(err => {
+  console.error(err);
+  alert("❌ Erreur lors de la sauvegarde !");
+});
+
 
 // ===================
 // DELETE
