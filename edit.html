@@ -412,66 +412,100 @@ title.addEventListener('input', () => {
 // SAVE
 // ===================
 
-form.onsubmit = e => {
-  
-if (!Array.isArray(games)) {
-  console.error("games invalide ❌", games);
-  games = [];
-}
+form.onsubmit = async (e) => {
 
   e.preventDefault();
 
-  const newGame = {
-    id: idInput.value,
-    title: title.value,
-    description: description.value,
-    pricesdate: new Date().toISOString().split('T')[0],
+  try {
 
-    image: image.value,
-    images: images.value.split(',').map(x=>x.trim()),
+    const newGame = {
+      id: idInput.value,
+      title: title.value,
+      description: description.value,
+      pricesdate: new Date().toISOString().split('T')[0],
+      image: image.value,
+      images: images.value.split(',').map(x => x.trim()),
+      youtube: normalizeYoutube(youtube.value),
+      age: Number(age.value),
+      players: players.value,
+      duration: Number(duration.value),
+      types: Array.from(types.selectedOptions).map(o => o.value),
+      child: Array.from(types.selectedOptions)
+        .map(o => o.value)
+        .includes("child") ? ["Enfants"] : [],
+      favorite: favorite.checked ? ["Coup de coeur"] : [],
+      discovery: discover.checked ? ["Wishlist"] : [],
+      buy: buy.checked ? ["Ludothèque"] : [],
+      spiel: spiel.checked ? ["Spiel"] : [],
+      cannes: cannes.checked ? ["Cannes"] : [],
+      rewards: rewards.value.split(',').map(x => x.trim()),
+      prices: Array.from(document.querySelectorAll('.price-item')).map(div => {
+        const i = div.querySelectorAll("input, select");
+        return {
+          vendor: i[0].value,
+          price: i[1].value,
+          url: i[2].value,
+          type: i[3].value,
+          best: i[4]?.checked || false
+        };
+      }),
+      price: price.value,
+      details: {
+        rules: rules.value,
+        material: material.value,
+        victory: victory.value,
+        rewards: []
+      }
+    };
 
-    youtube: normalizeYoutube(youtube.value),
-
-    age: Number(age.value),
-    players: players.value,
-    duration: Number(duration.value),
-
-    types: Array.from(types.selectedOptions).map(o=>o.value),
-
-    child: Array.from(types.selectedOptions)
-      .map(o => o.value)
-      .includes("child") ? ["Enfants"] : [],
-
-    favorite: favorite.checked ? ["Coup de coeur"] : [],
-    discovery: discover.checked ? ["Wishlist"] : [],
-    buy: buy.checked ? ["Ludothèque"] : [],
-
-    spiel: spiel.checked ? ["Spiel"] : [],
-    cannes: cannes.checked ? ["Cannes"] : [],
-
-    rewards: rewards.value.split(',').map(x => x.trim()),
-
-    prices: Array.from(document.querySelectorAll('.price-item')).map(div=>{
-      const i = div.querySelectorAll("input, select");
-      return {
-        vendor: i[0].value,
-        price: i[1].value,
-        url: i[2].value,
-        type: i[3].value,
-        best: i[4]?.checked || false
-      };
-    }),
-
-    price: price.value,
-
-    details: {
-      rules: rules.value,
-      material: material.value,
-      victory: victory.value,
-      rewards: []
+    // ✅ sécuriser le tableau
+    if (!Array.isArray(games)) {
+      games = [];
     }
 
-  };
+    const index = games.findIndex(g => g.id === newGame.id);
+
+    if (index >= 0) {
+      games[index] = newGame;
+    } else {
+      games.push(newGame);
+    }
+
+    console.log("📤 ENVOI :", games);
+
+    const res = await fetch(`${BASE_URL}/games`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(games)
+    });
+
+    if (!res.ok) {
+      const text = await res.text();
+      console.error("❌ ERREUR BACKEND :", text);
+      throw new Error("Erreur serveur");
+    }
+
+    // ✅ reload propre
+    const reload = await fetch(`${BASE_URL}/games`);
+    const data = await reload.json();
+
+    console.log("📥 RELOAD :", data);
+
+    if (!Array.isArray(data)) {
+      throw new Error("Données invalides");
+    }
+
+    games = data;
+
+    renderSelect();
+
+    alert("✅ Jeu enregistré !");
+    
+  } catch (err) {
+    console.error(err);
+    alert("❌ Erreur lors de l'enregistrement");
+  }
+};
 
   // ✅ 1. Mise à jour locale
   const index = games.findIndex(g => g.id === newGame.id);
