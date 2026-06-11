@@ -256,14 +256,15 @@ fetch(`${BASE_URL}/games`)
   .then(data => {
 
     if (!Array.isArray(data)) {
-      console.error("Données invalides ❌", data);
+      console.error("❌ DATA INVALID:", data);
       games = [];
       return;
     }
 
     games = data;
     renderSelect();
-  });
+  })
+  .catch(err => console.error(err));
 
 function renderSelect() {
   selector.innerHTML = `<option value="">-- Nouveau jeu --</option>`;
@@ -412,6 +413,12 @@ title.addEventListener('input', () => {
 // ===================
 
 form.onsubmit = e => {
+  
+if (!Array.isArray(games)) {
+  console.error("games invalide ❌", games);
+  games = [];
+}
+
   e.preventDefault();
 
   const newGame = {
