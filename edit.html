@@ -385,29 +385,60 @@ document.getElementById("form").onsubmit = async (e) => {
 
   try {
     const newGame = {
-      id: idInput.value,
-      title: title.value,
-      description: description.value,
-      image: image.value,
-      images: images.value.split(","),
-      youtube: youtube.value,
-      age: Number(age.value),
-      players: players.value,
-      duration: Number(duration.value),
-      
-      // ✅ AJOUT ICI
-      prices: Array.from(document.querySelectorAll('.price-item')).map(div => {
-        const i = div.querySelectorAll("input, select");
-        return {
-          vendor: i[0].value,
-          price: i[1].value,
-          url: i[2].value,
-          type: i[3].value,
-          best: i[4]?.checked || false
-        };
-      })
+  id: idInput.value,
+  title: title.value,
+  description: description.value,
+  image: image.value,
+  images: images.value.split(",").map(x => x.trim()),
+  youtube: youtube.value,
 
+  age: Number(age.value),
+  players: players.value,
+  duration: Number(duration.value),
+
+  // ✅ TYPES
+  types: Array.from(types.selectedOptions).map(o => o.value),
+
+  // ✅ CHILD
+  child: Array.from(types.selectedOptions)
+    .map(o => o.value)
+    .includes("child") ? ["Enfants"] : [],
+
+  // ✅ LABELS
+  favorite: favorite.checked ? ["Coup de coeur"] : [],
+  discovery: discover.checked ? ["Wishlist"] : [],
+  buy: buy.checked ? ["Ludothèque"] : [],
+
+  // ✅ AWARDS
+  spiel: spiel.checked ? ["Spiel"] : [],
+  cannes: cannes.checked ? ["Cannes"] : [],
+
+  // ✅ REWARDS
+  rewards: rewards.value.split(",").map(x => x.trim()),
+
+  // ✅ PRICE SIMPLE
+  price: price.value,
+
+  // ✅ PRICES DETAIL
+  prices: Array.from(document.querySelectorAll('.price-item')).map(div => {
+    const i = div.querySelectorAll("input, select");
+    return {
+      vendor: i[0].value,
+      price: i[1].value,
+      url: i[2].value,
+      type: i[3].value,
+      best: i[4]?.checked || false
     };
+  }),
+
+  // ✅ DETAILS COMPLETS
+  details: {
+    rules: rules.value,
+    material: material.value,
+    victory: victory.value,
+    rewards: []
+  }
+};
 
     let method = "POST";
     let url = `${BASE_URL}/games`;
@@ -423,11 +454,15 @@ document.getElementById("form").onsubmit = async (e) => {
       body: JSON.stringify(newGame)
     });
 
+    const text = await res.text();
+    console.log("RESPONSE RAW:", text);
+
     if (!res.ok) throw new Error("Erreur save");
 
     await loadGames();
 
     showStatus("✅ Jeu enregistré");
+    form.reset();
 
   } catch (err) {
     console.error(err);
