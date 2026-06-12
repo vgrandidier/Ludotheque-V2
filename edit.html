@@ -237,443 +237,146 @@ input[type="checkbox"] {
 </body>
 
 <script>
-document.addEventListener("DOMContentLoaded", () => {
 
 const BASE_URL = "https://ludotheque-backend.onrender.com";
 
 let games = [];
-let currentId = null;
-
-const imagesInput = document.getElementById("images");
-const imageInput = document.getElementById("image")
 
 // ===================
-// LOAD
+// LOAD GAMES
 // ===================
+async function loadGames() {
+  const res = await fetch(`${BASE_URL}/games`);
+  const data = await res.json();
 
-fetch(`${BASE_URL}/games`)
-  .then(r => r.json())
-  .then(data => {
+  if (!Array.isArray(data)) {
+    console.error("❌ data invalide");
+    games = [];
+    return;
+  }
 
-    if (!Array.isArray(data)) {
-      console.error("❌ DATA INVALID:", data);
-      games = [];
-      return;
-    }
+  games = data;
+  renderSelect();
+}
 
-    games = data;
-    renderSelect();
-  })
-  .catch(err => console.error(err));
+loadGames();
 
+// ===================
+// RENDER SELECT
+// ===================
 function renderSelect() {
+  const selector = document.getElementById("selector");
   selector.innerHTML = `<option value="">-- Nouveau jeu --</option>`;
+
   games.forEach(g => {
-    const o = document.createElement('option');
+    const o = document.createElement("option");
     o.value = g.id;
     o.textContent = g.title;
     selector.appendChild(o);
   });
 }
 
-// =====================================
-// CONVERSION YOUTUBE TO EMBEDDED FORMAT
-// =====================================
-function normalizeYoutube(url) {
-  if (!url) return "";
-
-  if (url.includes("watch?v=")) {
-    const id = url.split("watch?v=")[1];
-    return "https://www.youtube.com/embed/" + id;
-  }
-
-  return url;
-}
-
 // ===================
-// TYPES SELECT LOAD
+// STATUS
 // ===================
-
-function selectTypes(list) {
-  Array.from(types.options).forEach(opt => {
-    opt.selected = list.includes(opt.value);
-  });
-}
-
-// ===================
-// PRICES UI
-// ===================
-
-function addPrice(price = {}) {
-  const div = document.createElement('div');
-  div.className = "price-item" + (price.best ? " best" : "");
-
-  div.innerHTML = `
-    <div class="price-row">
-      <input placeholder="Vendeur" value="${price.vendor || ''}">
-      <input placeholder="Prix" value="${price.price || ''}">
-    </div>
-
-    <input placeholder="URL" value="${price.url || ''}">
-
-    <select>
-      <option value="default" ${price.type==="default"?"selected":""}>Default</option>
-      <option value="boutique" ${price.type==="boutique"?"selected":""}>Boutique</option>
-    </select>
-
-    <div class="price-footer">
-      <label>
-        <input type="checkbox" ${price.best ? "checked" : ""}>
-        Meilleur prix
-      </label>
-      <button type="button" class="secondary">Supprimer</button>
-    </div>
-  `;
-
-  // ✅ suppression
-  div.querySelector("button").onclick = () => div.remove();
-
-  // ✅ mise à jour visuelle du best
-  const checkbox = div.querySelector('input[type="checkbox"]');
-  checkbox.onchange = () => {
-    div.classList.toggle("best", checkbox.checked);
-  };
-
-  document.getElementById('prices-container').appendChild(div);
-}
-
-
-document.getElementById('add-price').onclick = () => addPrice();
-
-// ===================
-// SELECT GAME
-// ===================
-
-selector.onchange = e => {
-
-  const id = e.target.value;
-
-  if (!id) {
-    form.reset();
-    document.getElementById('prices-container').innerHTML="";
-    currentId = null;
-    return;
-  }
-
-  const g = games.find(x => x.id === id);
-  currentId = id;
-
-  idInput.value = g.id;
-  title.value = g.title;
-  description.value = g.description;
-  image.value = g.image;
-  images.value = (g.images || []).join(",");
-  youtube.value = g.youtube || "";
-
-  age.value = g.age;
-  players.value = g.players;
-  duration.value = g.duration;
-
-  selectTypes(g.types || []);
-
-  favorite.checked = (g.favorite||[]).length>0;
-  discover.checked = (g.discovery||[]).length>0;
-  buy.checked = (g.buy||[]).length>0;
-
-  spiel.checked = (g.spiel||[]).length>0;
-  cannes.checked = (g.cannes||[]).length>0;
-  rewards.value = (g.details?.rewards || []).join(",");
-  
-  price.value = g.price || "";
-
-  document.getElementById('prices-container').innerHTML="";
-  (g.prices || []).forEach(p => addPrice(p));
-
-  rules.value = g.details?.rules || "";
-  material.value = g.details?.material || "";
-  victory.value = g.details?.victory || "";
-
-  updatePreview();
-};
-
-// ===================
-// AUTO ID
-// ===================
-
-title.addEventListener('input', () => {
-  if (!currentId) {
-    idInput.value = title.value
-      .toLowerCase()
-      .replace(/\s+/g, '-');
-  }
-});
-
-// ===================
-// SAVE
-// ===================
-
-form.onsubmit = async (e) => {
-
-  e.preventDefault();
-
-  try {
-
-    const newGame = {
-      id: idInput.value,
-      title: title.value,
-      description: description.value,
-      pricesdate: new Date().toISOString().split('T')[0],
-      image: image.value,
-      images: images.value.split(',').map(x => x.trim()),
-      youtube: normalizeYoutube(youtube.value),
-      age: Number(age.value),
-      players: players.value,
-      duration: Number(duration.value),
-      types: Array.from(types.selectedOptions).map(o => o.value),
-      child: Array.from(types.selectedOptions)
-        .map(o => o.value)
-        .includes("child") ? ["Enfants"] : [],
-      favorite: favorite.checked ? ["Coup de coeur"] : [],
-      discovery: discover.checked ? ["Wishlist"] : [],
-      buy: buy.checked ? ["Ludothèque"] : [],
-      spiel: spiel.checked ? ["Spiel"] : [],
-      cannes: cannes.checked ? ["Cannes"] : [],
-      rewards: rewards.value.split(',').map(x => x.trim()),
-      prices: Array.from(document.querySelectorAll('.price-item')).map(div => {
-        const i = div.querySelectorAll("input, select");
-        return {
-          vendor: i[0].value,
-          price: i[1].value,
-          url: i[2].value,
-          type: i[3].value,
-          best: i[4]?.checked || false
-        };
-      }),
-      price: price.value,
-      details: {
-        rules: rules.value,
-        material: material.value,
-        victory: victory.value,
-        rewards: []
-      }
-    };
-
-    // ✅ sécuriser le tableau
-    if (!Array.isArray(games)) {
-      games = [];
-    }
-
-    const index = games.findIndex(g => g.id === newGame.id);
-
-    if (index >= 0) {
-      games[index] = newGame;
-    } else {
-      games.push(newGame);
-    }
-
-    console.log("📤 ENVOI :", games);
-
-    const res = await fetch(`${BASE_URL}/games`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(games)
-    });
-
-    if (!res.ok) {
-      const text = await res.text();
-      console.error("❌ ERREUR BACKEND :", text);
-      throw new Error("Erreur serveur");
-    }
-
-    // ✅ reload propre
-    const reload = await fetch(`${BASE_URL}/games`);
-    const data = await reload.json();
-
-    console.log("📥 RELOAD :", data);
-
-    if (!Array.isArray(data)) {
-      throw new Error("Données invalides");
-    }
-
-    games = data;
-
-    renderSelect();
-
-    alert("✅ Jeu enregistré !");
-    
-  } catch (err) {
-    console.error(err);
-    alert("❌ Erreur lors de l'enregistrement");
-  }
-};
-
-  // ✅ 1. Mise à jour locale
-  const index = games.findIndex(g => g.id === newGame.id);
-
-  if (index >= 0) games[index] = newGame;
-  else games.push(newGame);
-
-  // ✅ 2. Sauvegarde serveur
-
-fetch(`${BASE_URL}/games`, {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json'
-  },
-  body: JSON.stringify(games)
-})
-.then(async res => {
-  if (!res.ok) throw new Error("Erreur serveur");
-
-  // ✅ RECHARGER LES DONNÉES
-  const newData = await fetch(`${BASE_URL}/games`);
-  games = await newData.json();
-
-  renderSelect();
-
-  alert("✅ Sauvegardé !");
-})
-.catch(err => {
-  console.error(err);
-  alert("❌ Erreur lors de la sauvegarde !");
-});
-
-
-// ===================
-// DELETE
-// ===================
-
-document.getElementById('delete').onclick = () => {
-
-  if (!currentId) return;
-  if (!confirm("Supprimer ?")) return;
-
-  fetch(`${BASE_URL}/games/${currentId}`, {
-    method: 'DELETE'
-  })
-  .then(() => {
-    games = games.filter(g => g.id !== currentId);
-    form.reset();
-    currentId = null;
-    renderSelect();
-    alert("✅ Supprimé");
-  });
-
-};
-
-// =================
-// UPLOAD DES IMAGES
-// =================
-function showStatus(message, isError = false) {
-
-  const status = document.getElementById("status"); // ✅ AJOUT
-
+function showStatus(msg, error=false) {
+  const status = document.getElementById("status");
   if (!status) return;
 
-  status.innerText = message;
-  status.style.color = isError ? "red" : "green";
-
-  setTimeout(() => {
-    status.innerText = "";
-  }, 4000);
+  status.innerText = msg;
+  status.style.color = error ? "red" : "green";
 }
 
+// ===================
+// UPLOAD
+// ===================
 document.getElementById("btn-upload").onclick = async () => {
 
   console.log("CLICK upload ✅");
 
-  const input = document.getElementById("upload-images");
-  const files = input.files;
+  const files = document.getElementById("upload-images").files;
 
-  const status = document.getElementById("status");
-
-  console.log("CLICK upload");
-
-  if (!files || files.length === 0) {
-    showStatus("❌  Aucune image sélectionnée", true);
+  if (!files.length) {
+    showStatus("❌ Aucun fichier", true);
     return;
   }
 
-  if (files.length > 2) {
-    showStatus("❌ Maximum 2 images (boîte + plateau)", true);
-    return;
-  }
+  let uploaded = [];
 
-  let uploadedPaths = [];
+  try {
+    for (let file of files) {
 
-  for (let file of files) {
+      const fd = new FormData();
+      fd.append("image", file);
 
-    const formData = new FormData();
-    formData.append("image", file);
-
-    try {
       const res = await fetch(`${BASE_URL}/upload`, {
         method: "POST",
-        body: formData
+        body: fd
       });
 
       const data = await res.json();
 
-      if (!data.filename) throw new Error("Erreur serveur");
+      if (!data.url) throw new Error("Upload KO");
 
-      //uploadedPaths.push("images/" + data.filename);
-      uploadedPaths.push(data.url);
-
-    } catch (err) {
-      console.error(err);
-      showStatus("❌ Erreur upload image", true);
-      return;
+      uploaded.push(data.url);
     }
+
+    document.getElementById("image").value = uploaded[0];
+    document.getElementById("images").value = uploaded.join(",");
+
+    showStatus("✅ Upload OK");
+
+  } catch (err) {
+    console.error(err);
+    showStatus("❌ Upload erreur", true);
   }
-
-  // ✅ Affectation propre
-  const imageInput = document.getElementById("image");
-  const imagesInput = document.getElementById("images");
-
-
-if (!imageInput || !imagesInput) {
-  console.error("Inputs image/images introuvables ❌");
-  return;
-}
-
-
-  imageInput.value = uploadedPaths[0];              // principale
-  imagesInput.value = uploadedPaths.join(",");     // galerie
-
-    // ✅ reset input (optionnel)
-  //input.value = "";
-
-
-// ✅ afficher les noms des fichiers
-const fileNames = Array.from(files).map(f => f.name);
-
-status.innerHTML = `
-  ✅ Images uploadées :<br>
-  ${fileNames.map(name => `- ${name}`).join("<br>")}
-`;
-
-
-status.innerHTML += `
-  <br><br>
-  ${uploadedPaths.map(p => `<img src="${BASE_URL}/${p}" width="100">`).join("")}
-`;
-
-
 };
 
-});
-
 // ===================
-// DOWNLOAD
+// SAVE GAME
 // ===================
+document.getElementById("form").onsubmit = async (e) => {
 
-/*download.onclick = () => {
-  const blob = new Blob([JSON.stringify(games,null,2)], {type:"application/json"});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = "games.json";
-  a.click();
-};*/
+  e.preventDefault();
+
+  try {
+    const newGame = {
+      id: idInput.value,
+      title: title.value,
+      description: description.value,
+      image: image.value,
+      images: images.value.split(","),
+      youtube: youtube.value,
+      age: Number(age.value),
+      players: players.value,
+      duration: Number(duration.value)
+    };
+
+    let method = "POST";
+    let url = `${BASE_URL}/games`;
+
+    if (games.find(g => g.id === newGame.id)) {
+      method = "PUT";
+      url = `${BASE_URL}/games/${newGame.id}`;
+    }
+
+    const res = await fetch(url, {
+      method,
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify(newGame)
+    });
+
+    if (!res.ok) throw new Error("Erreur save");
+
+    await loadGames();
+
+    showStatus("✅ Jeu enregistré");
+
+  } catch (err) {
+    console.error(err);
+    showStatus("❌ Erreur sauvegarde", true);
+  }
+};
 
 </script>
 </html>
