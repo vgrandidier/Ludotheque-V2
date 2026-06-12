@@ -392,6 +392,22 @@ function addPrice(price = {}) {
 
 document.getElementById('add-price').onclick = () => addPrice();
 
+document.getElementById('title').addEventListener('input', () => {
+
+  if (!currentId) {
+
+    const value = title.value
+      .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // enlever accents
+      .toLowerCase()
+      .trim()
+      .replace(/\s+/g, '-')
+      .replace(/[^\w\-]/g, '');
+
+    idInput.value = value;
+  }
+
+});
+
 // ===================
 // SAVE GAME
 // ===================
@@ -406,7 +422,7 @@ document.getElementById("form").onsubmit = async (e) => {
   description: description.value,
   image: image.value,
   images: images.value.split(",").map(x => x.trim()),
-  youtube: youtube.value,
+  youtube: normalizeYoutube(youtube.value),
 
   age: Number(age.value),
   players: players.value,
