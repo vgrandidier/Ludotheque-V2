@@ -218,7 +218,7 @@ fetch(`${BASE_URL}/games`)
     // ==========================
 
     const rewardsList = document.getElementById('rewards');
-    (game.details?.rewards || []).forEach(r => {
+    (game.rewards || []).forEach(r => {
       const li = document.createElement('li');
       li.innerText = r;
       rewardsList.appendChild(li);
