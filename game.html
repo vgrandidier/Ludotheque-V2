@@ -194,7 +194,7 @@ fetch(`${BASE_URL}/games`)
 
     images.forEach((src, index) => {
       const img = document.createElement('img');
-      img.src = `${BASE_URL}/${src}`;
+      img.src = `${src}`;
 
       img.addEventListener('click', () => openModal(index));
 

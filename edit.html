@@ -261,6 +261,22 @@ async function loadGames() {
 
 loadGames();
 
+document.getElementById('title').addEventListener('input', () => {
+
+  if (!currentId) {
+
+    const value = title.value
+      .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // enlever accents
+      .toLowerCase()
+      .trim()
+      .replace(/\s+/g, '-')
+      .replace(/[^\w\-]/g, '');
+
+    idInput.value = value;
+  }
+
+});
+
 // ===================
 // RENDER SELECT
 // ===================
