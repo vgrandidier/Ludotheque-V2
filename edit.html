@@ -333,6 +333,50 @@ document.getElementById("btn-upload").onclick = async () => {
 };
 
 // ===================
+// PRICES UI
+// ===================
+function addPrice(price = {}) {
+
+  const div = document.createElement('div');
+  div.className = "price-item" + (price.best ? " best" : "");
+
+  div.innerHTML = `
+    <div class="price-row">
+      <input placeholder="Vendeur" value="${price.vendor || ''}">
+      <input placeholder="Prix" value="${price.price || ''}">
+    </div>
+
+    <input placeholder="URL" value="${price.url || ''}">
+
+    <select>
+      <option value="default" ${price.type==="default"?"selected":""}>Default</option>
+      <option value="boutique" ${price.type==="boutique"?"selected":""}>Boutique</option>
+    </select>
+
+    <div class="price-footer">
+      <label>
+        <input type="checkbox" ${price.best ? "checked" : ""}>
+        Meilleur prix
+      </label>
+      <button type="button" class="secondary">Supprimer</button>
+    </div>
+  `;
+
+  // ✅ suppression
+  div.querySelector("button").onclick = () => div.remove();
+
+  // ✅ toggle best
+  const checkbox = div.querySelector('input[type="checkbox"]');
+  checkbox.onchange = () => {
+    div.classList.toggle("best", checkbox.checked);
+  };
+
+  document.getElementById('prices-container').appendChild(div);
+}
+
+document.getElementById('add-price').onclick = () => addPrice();
+
+// ===================
 // SAVE GAME
 // ===================
 document.getElementById("form").onsubmit = async (e) => {
@@ -349,7 +393,20 @@ document.getElementById("form").onsubmit = async (e) => {
       youtube: youtube.value,
       age: Number(age.value),
       players: players.value,
-      duration: Number(duration.value)
+      duration: Number(duration.value),
+      
+      // ✅ AJOUT ICI
+      prices: Array.from(document.querySelectorAll('.price-item')).map(div => {
+        const i = div.querySelectorAll("input, select");
+        return {
+          vendor: i[0].value,
+          price: i[1].value,
+          url: i[2].value,
+          type: i[3].value,
+          best: i[4]?.checked || false
+        };
+      })
+
     };
 
     let method = "POST";
