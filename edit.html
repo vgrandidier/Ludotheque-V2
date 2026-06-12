@@ -241,6 +241,7 @@ input[type="checkbox"] {
 const BASE_URL = "https://ludotheque-backend.onrender.com";
 
 let games = [];
+let currentId = null;
 
 // ===================
 // LOAD GAMES
@@ -260,6 +261,71 @@ async function loadGames() {
 }
 
 loadGames();
+
+document.getElementById("selector").onchange = (e) => {
+
+  const id = e.target.value;
+
+  // ✅ nouveau jeu → reset
+  if (!id) {
+    document.getElementById("form").reset();
+    currentId = null;
+    return;
+  }
+
+  const g = games.find(x => x.id === id);
+
+  if (!g) {
+    console.error("Jeu introuvable ❌");
+    return;
+  }
+
+  currentId = id;
+
+  // ✅ remplissage des champs
+  idInput.value = g.id || "";
+  title.value = g.title || "";
+  description.value = g.description || "";
+
+  image.value = g.image || "";
+  images.value = (g.images || []).join(",");
+
+  youtube.value = g.youtube || "";
+
+  age.value = g.age || "";
+  players.value = g.players || "";
+  duration.value = g.duration || "";
+
+  // ✅ types
+  Array.from(types.options).forEach(opt => {
+    opt.selected = (g.types || []).includes(opt.value);
+  });
+
+  // ✅ labels
+  favorite.checked = (g.favorite || []).length > 0;
+  discover.checked = (g.discovery || []).length > 0;
+  buy.checked = (g.buy || []).length > 0;
+
+  // ✅ awards
+  spiel.checked = (g.spiel || []).length > 0;
+  cannes.checked = (g.cannes || []).length > 0;
+
+  // ✅ rewards
+  rewards.value = (g.rewards || []).join(",");
+
+  // ✅ prix simple
+  price.value = g.price || "";
+
+  // ✅ prix détaillés
+  document.getElementById("prices-container").innerHTML = "";
+  (g.prices || []).forEach(p => addPrice(p));
+
+  // ✅ détails
+  rules.value = g.details?.rules || "";
+  material.value = g.details?.material || "";
+  victory.value = g.details?.victory || "";
+};
+
 
 document.getElementById('title').addEventListener('input', () => {
 
